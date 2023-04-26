@@ -1,5 +1,4 @@
-from GDM import ADP
-from GDM.Graph import Graph
+from GDM.GridGraph import GridGraph
 from GDM.utility import *
 
 from random import choice, seed
@@ -7,8 +6,8 @@ from itertools import combinations
 
 seed(0)
 
-def __build_grid_world(MAX_X, MAX_Y):
-    g = Graph() 
+def __build_grid_world(MAX_X, MAX_Y) -> Tuple[str, GridGraph]:
+    g = GridGraph() 
 
     # create nodes
     for y in range(MAX_Y):

@@ -1,9 +1,9 @@
 from typing import Dict
 
 from ..utility import reset_utility, create_policy, calculate_max_utility
-from ..Graph import Graph
+from ..GridGraph import GridGraph
 
-def __in_place_value_iteration(G: Graph, max_iteration: int, gamma: float, theta: float):
+def __in_place_value_iteration(G: GridGraph, max_iteration: int, gamma: float, theta: float):
     for k in range(max_iteration):
         delta = 0
 
@@ -19,7 +19,7 @@ def __in_place_value_iteration(G: Graph, max_iteration: int, gamma: float, theta
             
     print(f'{k} iterations to converge.')
 
-def __value_iteration(G: Graph, max_iteration: int, gamma: float, theta: float):
+def __value_iteration(G: GridGraph, max_iteration: int, gamma: float, theta: float):
     for _ in range(max_iteration):
         delta = 0
         u_temp: Dict[str, float] = {}
@@ -35,7 +35,7 @@ def __value_iteration(G: Graph, max_iteration: int, gamma: float, theta: float):
             break
 
 def value_iteration(
-        G: Graph, max_iteration: int, gamma: float, theta: float, 
+        G: GridGraph, max_iteration: int, gamma: float, theta: float, 
         in_place: bool=False, should_reset_utility: bool=True) -> Dict[str, str]:
             
     if should_reset_utility:

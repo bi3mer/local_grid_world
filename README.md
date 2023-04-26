@@ -1,6 +1,6 @@
 # Local Grid World
 
-This is a simple implementation of grid world using [GDM](https://github.com/bi3mer/GDM/tree/main), where the policy is local.
+This is a simple implementation of grid world based [GDM](https://github.com/bi3mer/GDM/tree/main), except the policy is local and based on coordinates.
 
 # Run Instructions
 

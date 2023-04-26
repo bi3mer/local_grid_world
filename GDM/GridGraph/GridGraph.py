@@ -2,16 +2,16 @@ from typing import Callable, Set, Dict, List, Tuple
 from .Edge import Edge
 from .Node import Node
 
-class Graph:
+class GridGraph:
     def __init__(self):
-        self.nodes: Dict[str, Node] = {}
-        self.edges: Dict[str, Edge] = {}
+        self.nodes: Dict[Tuple[int, int], Node] = {}
+        self.edges: Dict[Tuple[int, int], Edge] = {}
 
     ##### Node Operations
-    def get_node(self, node_name: str) -> Node:
+    def get_node(self, node_name: Tuple[int, int]) -> Node:
         return self.nodes[node_name]
 
-    def has_node(self, node_name: str) -> bool:
+    def has_node(self, node_name: Tuple[int, int]) -> bool:
         return node_name in self.nodes
 
     def add_node(self, node: Node):
@@ -19,16 +19,15 @@ class Graph:
         assert node.name not in self.nodes
         self.nodes[node.name] = node
 
-    def add_default_node(self, node_name: str, reward: float=1.0, utility: float=0.0, 
-                         terminal: bool=False, neighbors: Set[str]=None):
+    def add_default_node(self, node_name: Tuple[int, int], reward: float=1.0, utility: float=0.0, 
+                         terminal: bool=False, up: bool=False, down: bool=False, 
+                         left: bool=False, right: bool=False):
 
         assert node_name not in self.nodes
-        if neighbors == None:
-            neighbors = set()
 
-        self.nodes[node_name] = Node(node_name, reward, utility, terminal, neighbors)
+        self.nodes[node_name] = Node(node_name, reward, utility, terminal, up, down, left, right)
 
-    def remove_node(self, node_name: str):
+    def remove_node(self, node_name: Tuple[int, int]):
         assert node_name in self.nodes
 
         edges_to_remove: List[Edge] = []
@@ -61,10 +60,10 @@ class Graph:
         del self.nodes[node_name]
 
     ##### Edge Operations
-    def get_edge(self, src_name: str, tgt_name: str) -> Edge:
+    def get_edge(self, src_name: Tuple[int, int], tgt_name: Tuple[int, int]) -> Edge:
         return self.edges[(src_name, tgt_name)]
 
-    def has_edge(self, src_name: str, tgt_name: str) -> bool:
+    def has_edge(self, src_name: Tuple[int, int], tgt_name: Tuple[int, int]) -> bool:
         return (src_name, tgt_name) in self.edges
 
     def add_edge(self, edge: Edge):
@@ -78,13 +77,13 @@ class Graph:
         if edge.tgt not in neighbors:
             neighbors.add(edge.tgt)
 
-    def add_default_edge(self, src_name: str, tgt_name: str, p: List[Tuple[str, float]]=None):
+    def add_default_edge(self, src_name: Tuple[int, int], tgt_name: Tuple[int, int], p: List[Tuple[Tuple[int, int], float]]=None):
         if p == None:
             p = []
 
         self.add_edge(Edge(src_name, tgt_name, p))
 
-    def remove_edge(self, src_node: str, tgt_node: str):
+    def remove_edge(self, src_node: Tuple[int, int], tgt_node: Tuple[int, int]):
         assert src_node in self.nodes
         assert tgt_node in self.nodes
         assert (src_node, tgt_node) in self.edges
@@ -93,20 +92,20 @@ class Graph:
         del self.edges[(src_node, tgt_node)]
 
     ##### Useful Functions
-    def neighbors(self, node_name: str) -> Set[str]:
+    def neighbors(self, node_name: Tuple[int, int]) -> Set[Tuple[int, int]]:
         return self.nodes[node_name].neighbors
 
-    def set_node_utilities(self, utilities: Dict[str, float]):
+    def set_node_utilities(self, utilities: Dict[Tuple[int, int], float]):
         for node_name, utility in utilities.items():
             self.nodes[node_name].utility = utility
 
-    def utility(self, node_name: str) -> float:
+    def utility(self, node_name: Tuple[int, int]) -> float:
         return self.nodes[node_name].utility
 
-    def reward(self, node_name: str) -> float:
+    def reward(self, node_name: Tuple[int, int]) -> float:
         return self.nodes[node_name].reward
 
-    def is_terminal(self, node_name: str) -> bool:
+    def is_terminal(self, node_name: Tuple[int, int]) -> bool:
         return self.nodes[node_name].is_terminal
 
     def map_nodes(self, func: Callable[[Node], None]):

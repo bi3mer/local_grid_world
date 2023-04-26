@@ -1,12 +1,12 @@
 # from networkx import set_node_attributes
 from typing import Dict
 from math import inf
-from ..Graph import Graph
+from ..GridGraph import GridGraph
 
 from ..utility import calculate_utility, calculate_max_utility, create_random_policy, reset_utility
 
 ######################## Policy Evaluation ########################
-def __modified_in_place_policy_evaluation(G: Graph, pi: Dict[str, str], gamma: float, policy_k: int):
+def __modified_in_place_policy_evaluation(G: GridGraph, pi: Dict[str, str], gamma: float, policy_k: int):
     for __ in range(policy_k):
         for n in G.nodes:
             node = G.get_node(n)
@@ -15,7 +15,7 @@ def __modified_in_place_policy_evaluation(G: Graph, pi: Dict[str, str], gamma: f
 
             node.utility = calculate_utility(G, n, pi[n], gamma)
 
-def __modified_policy_evaluation(G: Graph, pi: Dict[str, str], gamma: float, policy_k: int):
+def __modified_policy_evaluation(G: GridGraph, pi: Dict[str, str], gamma: float, policy_k: int):
     for __ in range(policy_k):
         u_temp: Dict[str, float] = {}
         for n in G.nodes:
@@ -26,12 +26,12 @@ def __modified_policy_evaluation(G: Graph, pi: Dict[str, str], gamma: float, pol
         
         G.set_node_utilities(u_temp)
 
-def __in_place_policy_evaluation(G: Graph, _, gamma: float, policy_k: int):
+def __in_place_policy_evaluation(G: GridGraph, _, gamma: float, policy_k: int):
     for __ in range(policy_k):
         for n in G.nodes:
             G.get_node(n).utility = calculate_max_utility(G, n, gamma)
 
-def __policy_evaluation(G: Graph, _, gamma: float, policy_k: int):
+def __policy_evaluation(G: GridGraph, _, gamma: float, policy_k: int):
     for __ in range(policy_k):
         u_temp: Dict[str, float] = {}
         for n in G.nodes:
@@ -40,7 +40,7 @@ def __policy_evaluation(G: Graph, _, gamma: float, policy_k: int):
         G.set_node_utilities(u_temp)
 
 ######################## Policy Improvement ########################
-def __policy_improvement(G: Graph, pi: Dict[str, str], gamma: float) -> bool:
+def __policy_improvement(G: GridGraph, pi: Dict[str, str], gamma: float) -> bool:
     changed = False
     for n in G.nodes:
         if G.get_node(n).is_terminal:
@@ -62,7 +62,7 @@ def __policy_improvement(G: Graph, pi: Dict[str, str], gamma: float) -> bool:
     return changed
 
 ######################## Policy Iteration ########################
-def policy_iteration(G: Graph, gamma: float, modified: bool=False, 
+def policy_iteration(G: GridGraph, gamma: float, modified: bool=False, 
                      in_place: bool=False, policy_k: int=10, 
                      should_reset_utility: bool=True) -> Dict[str, str]:
     # reset utility
