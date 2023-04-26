@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+install = "*"
+gdm = {editable = true, ref = "main", git = "https://github.com/bi3mer/GDM.git"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
