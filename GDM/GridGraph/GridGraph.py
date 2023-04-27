@@ -73,7 +73,7 @@ class GridGraph:
         assert (edge.src, edge.tgt) not in self.edges
         self.edges[(edge.src, edge.tgt)] = edge
         
-        neighbors = self.nodes[edge.src].neighbors
+        neighbors = self.nodes[edge.src].policy_key
         if edge.tgt not in neighbors:
             neighbors.add(edge.tgt)
 

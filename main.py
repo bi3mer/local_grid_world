@@ -1,87 +1,102 @@
-from GDM.GridGraph import GridGraph
-from GDM.utility import *
+# from GDM.GridGraph import GridGraph
+# from GDM.utility import *
+# from GDM import Policy
 
 from random import choice, seed
 from itertools import combinations
 
+from GridWorld import Policy, GridWorld
+
 seed(0)
 
-def __build_grid_world(MAX_X, MAX_Y) -> Tuple[str, GridGraph]:
-    g = GridGraph() 
 
-    # create nodes
-    for y in range(MAX_Y):
-        for x in range(MAX_X):
-            # ignore the blank position
-            if y == 1 and x == 1:
-                continue
+world = GridWorld(4,3)
+pi = Policy()
 
-            # create node and its reward
-            src = f'{y}_{x}'
-            if x == MAX_X - 1 and y == MAX_Y - 1:
-                g.add_default_node(src, reward=1, terminal=True)
-            elif x == MAX_X - 1 and y == MAX_Y - 2:
-                g.add_default_node(src, reward=-1.0, terminal=True)
-            else:
-                g.add_default_node(src, reward=-0.04)
+i = 0
+world.print()
+while not world.make_move(pi) and i < 10:
+    print('\n=============================\n')
+    world.print()
+    i += 1
 
-    # create edges
-    for src in g.nodes:
-        # get name
-        y, x = [int(i) for i in src.split('_')]
+print('\n=============================\n')
 
-        # create left connection
-        if x - 1 >= 0 and not (x - 1 == 1 and y == 1):
-            tgt = f'{y}_{x-1}'
-            g.add_default_edge(src, tgt, [(tgt, 1.0)])
+# def __build_grid_world(MAX_X, MAX_Y) -> Tuple[str, GridGraph]:
+#     g = GridGraph() 
 
-        # create right connection
-        if x + 1 < MAX_X and not (x + 1 == 1 and y == 1):
-            tgt = f'{y}_{x+1}'
-            g.add_default_edge(src, tgt, [(tgt, 1.0)])
+#     # create nodes
+#     for y in range(MAX_Y):
+#         for x in range(MAX_X):
+#             # ignore the blank position
+#             if y == 1 and x == 1:
+#                 continue
 
-        # create up connection
-        if y - 1 >= 0 and not (x == 1 and y - 1 == 1):
-            tgt = f'{y-1}_{x}'
-            g.add_default_edge(src, tgt, [(tgt, 1.0)])
+#             # create node and its reward
+#             src = f'{y}_{x}'
+#             if x == MAX_X - 1 and y == MAX_Y - 1:
+#                 g.add_default_node(src, reward=1, terminal=True)
+#             elif x == MAX_X - 1 and y == MAX_Y - 2:
+#                 g.add_default_node(src, reward=-1.0, terminal=True)
+#             else:
+#                 g.add_default_node(src, reward=-0.04)
 
-        # create down connection
-        if y + 1 < MAX_Y and not (x == 1 and y + 1 == 1):
-            tgt = f'{y+1}_{x}'
-            g.add_default_edge(src, tgt, [(tgt, 1.0)])
+#     # create edges
+#     for src in g.nodes:
+#         # get name
+#         y, x = [int(i) for i in src.split('_')]
 
-    return '0_0', g
+#         # create left connection
+#         if x - 1 >= 0 and not (x - 1 == 1 and y == 1):
+#             tgt = f'{y}_{x-1}'
+#             g.add_default_edge(src, tgt, [(tgt, 1.0)])
 
-def __display_utility_table(G, MAX_X, MAX_Y):
-    print()
-    print('--------' * MAX_X + '-')
-    for y in reversed(range(MAX_Y)):
-        out = '| '
-        for x in range(MAX_X):
-            if x == 1 and y == 1:
-                out += '      |'
-            else:
-                key = f'{y}_{x}'
-                out +=  '{:.2f} | '.format(G.get_node(key).utility)
+#         # create right connection
+#         if x + 1 < MAX_X and not (x + 1 == 1 and y == 1):
+#             tgt = f'{y}_{x+1}'
+#             g.add_default_edge(src, tgt, [(tgt, 1.0)])
+
+#         # create up connection
+#         if y - 1 >= 0 and not (x == 1 and y - 1 == 1):
+#             tgt = f'{y-1}_{x}'
+#             g.add_default_edge(src, tgt, [(tgt, 1.0)])
+
+#         # create down connection
+#         if y + 1 < MAX_Y and not (x == 1 and y + 1 == 1):
+#             tgt = f'{y+1}_{x}'
+#             g.add_default_edge(src, tgt, [(tgt, 1.0)])
+
+#     return '0_0', g
+
+# def __display_utility_table(G, MAX_X, MAX_Y):
+#     print()
+#     print('--------' * MAX_X + '-')
+#     for y in reversed(range(MAX_Y)):
+#         out = '| '
+#         for x in range(MAX_X):
+#             if x == 1 and y == 1:
+#                 out += '      |'
+#             else:
+#                 key = f'{y}_{x}'
+#                 out +=  '{:.2f} | '.format(G.get_node(key).utility)
         
-        print(out)
-        print('--------' * MAX_X + '-')
+#         print(out)
+#         print('--------' * MAX_X + '-')
 
-def get_xy(name: str) -> Tuple[int, int]:
-    return (int(num) for num in name.split('_'))
 
-start, G = __build_grid_world(4, 3)
-possible_differences = ((1,0),(-1,0),(0,1),(0,-1))
-pi = {}
 
-states = list((s,) for s in possible_differences)
-states += list(combinations(possible_differences, 2))
-states += list(combinations(possible_differences, 3))
-states += list(combinations(possible_differences, 4))
+# start, G = __build_grid_world(4, 3)
+# possible_differences = ((1,0),(-1,0),(0,1),(0,-1))
+# pi = {
 
-for s in states:
-    pi[s] = choice(s)
-    print(f'{s}: {pi[s]}')
+# states = list((s,) for s in possible_differences)
+# states += list(combinations(possible_differences, 2))
+# states += list(combinations(possible_differences, 3))
+# states += list(combinations(possible_differences, 4))
+
+# for s in states:
+#     pi[s] = choice(s)
+#     print(f'{s}: {pi[s]}')
 # print(pi)
 
 # for node in G.nodes:
