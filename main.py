@@ -28,3 +28,5 @@ WIDTH = 4
 HEIGHT = 3
 grid_world = GridWorld(WIDTH, HEIGHT)
 G = grid_world.to_graph()
+
+grid_world.print()
