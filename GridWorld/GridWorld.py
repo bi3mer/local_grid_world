@@ -61,6 +61,5 @@ class GridWorld:
 
         return new_state == State.POSITIVE_REWARD or new_state == State.NEGATIVE_REWARD
             
-
     def print(self) -> None:
         print('\n'.join(''.join(s.to_string() for s in row) for row in self.grid))
