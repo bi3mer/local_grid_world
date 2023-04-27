@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ed6d5d614626ae28e274e453164affb26694755170ccab3aa5866f093d51d3e4"
+            "sha256": "28368169adfa2002469b8b24607e49246ced162418b24ae397a2afae7c676d69"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -15,6 +15,12 @@
             }
         ]
     },
-    "default": {},
+    "default": {
+        "gdm": {
+            "editable": true,
+            "git": "https://github.com/bi3mer/GDM.git",
+            "ref": "649314cfb2f6e71e41e8d66be18023b475439ef1"
+        }
+    },
     "develop": {}
 }

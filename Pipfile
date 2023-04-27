@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+gdm = {editable = true, ref = "main", git = "https://github.com/bi3mer/GDM.git"}
 
 [dev-packages]
 

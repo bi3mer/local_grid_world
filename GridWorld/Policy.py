@@ -3,9 +3,13 @@ from itertools import product
 from random import random, seed
 
 from .Direction import Direction
-from .State import State
+from .Tile import Tile
+
+Key = Tuple[Tile, Tile, Tile, Tile]
+Utility = Tuple[float, float, float, float]
 
 class Policy:
+    IMPOSSIBLE_UTILITY = -10000000
     DIRS = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
     
     def __init__(self, _seed: int = 0):
@@ -13,24 +17,22 @@ class Policy:
         It would be smart to support depth so you could 
         '''
         seed(_seed)
+        self.states: Dict[Key, Utility] = {}
 
-        self.player_pos: Tuple[int, int] = (0,0)
-        self.states: Dict[Tuple[State, State, State, State], Tuple[int, int, int, int]] = {}
-
-        ALL_STATES = [State.EMPTY, State.NEGATIVE_REWARD, State.POSITIVE_REWARD, State.BLOCK]
+        ALL_STATES = [Tile.EMPTY, Tile.NEGATIVE_REWARD, Tile.POSITIVE_REWARD, Tile.BLOCK]
         
         # 80 possible states with only block, block, block, block skipped
         for s in product(ALL_STATES, repeat=4):
             utility: List[Direction] = []
-            for i, dir in enumerate(self.DIRS):
-                if s[i] != State.BLOCK:
+            for i in range(self.DIRS):
+                if s[i] != Tile.BLOCK:
                     utility.append(random())
                 else:
-                    utility.append(-10000000)
+                    utility.append(self.IMPOSSIBLE_UTILITY)
 
             self.states[s] = tuple(utility)
 
-    def get(self, state: Tuple[State, State, State, State]) -> Direction:
+    def get(self, state: Key) -> Direction:
         best_dir = Direction.UP
         best_utility = -1
 
@@ -41,9 +43,11 @@ class Policy:
 
         return best_dir
     
-    def reset_player_position(self) -> None:
-        self.player_pos = (0,0)
+    def reset_utility(self) -> None:
+        for s in self.states:
+            for i in range(len(self.DIRS)):
+                if self.states[s][i] != self.IMPOSSIBLE_UTILITY:
+                    self.states[s][i] = random()
 
-        
-
-    
+    def update_utility(self, state: Key, utility: Utility) -> None:
+        self.states[state] = utility

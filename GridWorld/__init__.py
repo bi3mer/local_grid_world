@@ -1,4 +1,4 @@
 from .Direction import Direction
-from .State import State
+from .Tile import Tile
 from .Policy import Policy
-from .GridWorld import GridWorld
+from .GridWorld import GridWorld, Neighbor
