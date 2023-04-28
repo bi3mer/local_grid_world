@@ -1,32 +1,21 @@
-from __future__ import annotations
-from typing import Dict, List, Tuple
+import gymnasium as gym
+from time import sleep  
 
-from GDM import ADP
-from GDM.Graph import Graph
-from itertools import product
+from QLearning import QLearning
 
-from GridWorld import Tile, Direction, GridWorld, Neighbor
-from GridWorld.Policy import Key
+def print_frames(frames):
+    for i, frame in enumerate(frames):
+        print(frame['frame'])
+        print(f"Timestep: {i + 1}")
+        print(f"State: {frame['state']}")
+        print(f"Action: {frame['action']}")
+        print(f"Reward: {frame['reward']}")
+        sleep(.1)
 
+env: gym.Env = gym.make("Taxi-v3", render_mode='ansi')
+env.reset()
 
-
-def state_to_key(state: Key) -> str:
-    return ','.join(s.to_string() for s in state)
-
-
-
-G = Graph()
-ALL_TILES = [Tile.EMPTY, Tile.NEGATIVE_REWARD, Tile.POSITIVE_REWARD, Tile.BLOCK]
-
-for state in product(ALL_TILES, repeat=4):
-    G.add_default_node(
-        node_name=state_to_key(state),
-        reward=-0.04,
-    )
-
-WIDTH = 4
-HEIGHT = 3
-grid_world = GridWorld(WIDTH, HEIGHT)
-G = grid_world.to_graph()
-
-grid_world.print()
+q_learning = QLearning(env)
+q_learning.train(50000)
+q_learning.epoch_evaluation()
+q_learning.visualize_policy_playthrough()
