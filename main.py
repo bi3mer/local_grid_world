@@ -1,8 +1,6 @@
 import gymnasium as gym
-from time import sleep  
 
 from QLearning import QLearning
-
 
 env: gym.Env = gym.make("Taxi-v3", render_mode='ansi')
 env.reset()

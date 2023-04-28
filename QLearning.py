@@ -31,7 +31,7 @@ class QLearning:
                 else:
                     action = np.argmax(self.q_table[state])
 
-                next_state, reward, done, truncated, info = self.env.step(action) 
+                next_state, reward, done, _, _ = self.env.step(action) 
 
                 old_value = self.q_table[state, action]
                 next_max = np.max(self.q_table[next_state])
@@ -58,7 +58,7 @@ class QLearning:
             
             while not done:
                 action = np.argmax(self.q_table[state])
-                state, reward, done, truncated, info = self.env.step(action)
+                state, reward, done, _, _ = self.env.step(action)
 
                 if reward == -10:
                     penalties += 1
@@ -69,7 +69,7 @@ class QLearning:
             total_epochs += epochs
 
         print(f"Results after {episodes} episodes:")
-        print(f"Average timesteps per episode: {total_epochs / episodes}")
+        print(f"Average time steps per episode: {total_epochs / episodes}")
         print(f"Average penalties per episode: {total_penalties / episodes}")
 
     def visualize_policy_playthrough(self):
@@ -78,7 +78,7 @@ class QLearning:
 
         while not done:
             action = np.argmax(self.q_table[state])
-            state, reward, done, truncated, info = self.env.step(action)
+            state, reward, done, _, _ = self.env.step(action)
 
             print(self.env.render())
             print(f'reward={reward}')
