@@ -1,27 +1,25 @@
 from __future__ import annotations
 from typing import List, Tuple
 from enum import IntEnum
-from random import randint
+from random import randint, shuffle
 from collections import namedtuple
 
 Position = namedtuple("Position", ["x", "y"])
-
-DIR = [
-    Position(0,1),
-    Position(0,-1),
-    Position(1,0),
-    Position(-1,0),
-    Position(1,1),
-    Position(1,-1),
-    Position(-1,1),
-    Position(-1,-1),
-]
 
 class Action(IntEnum):
     Up = 0
     Down = 1
     Left = 2
     Right = 3
+
+    @staticmethod
+    def from_int(num: int) -> Action:
+        if num == 0: return Action.Up
+        if num == 1: return Action.Down
+        if num == 2: return Action.Left
+        if num == 3: return Action.Right
+
+        raise SystemError(f'Unsupported integer to convert to action: {num}.')
 
     def to_position(self) -> Position:
         if self == Action.Up: return Position(0, -1)
@@ -31,14 +29,13 @@ class Action(IntEnum):
 
         raise SystemError(f'Unsupported action type: {self}.')
     
-    @staticmethod
-    def from_int(num: int) -> Action:
-        if num == 0: return Action.Up
-        if num == 1: return Action.Down
-        if num == 2: return Action.Left
-        if num == 3: return Action.Right
+    def to_str(self) -> str:
+        if self == Action.Up: return 'Up'
+        if self == Action.Down: return 'Down'
+        if self == Action.Left: return 'Left'
+        if self == Action.Right: return 'Right'
 
-        raise SystemError(f'Unsupported integer to convert to action: {num}.')
+        raise SystemError(f'Unsupported action type: {self}.')
 
 class Tile(IntEnum):
     Empty = 0
@@ -57,10 +54,12 @@ class Tile(IntEnum):
         raise SystemError(f'Unsupported tile type: {self}.')
 
 class GridWorld:
-    BASE_REWARD = -1
-    HAZARD_REWARD = -20
+    BASE_REWARD = -0.04
+    HAZARD_REWARD = -30
     NEGATIVE_REWARD = -20
     GOAL_REWARD = 20
+
+    OBSERVATION_SIZE = 5
 
     def __init__(self, width: int, height: int):
         self.width = width
@@ -103,7 +102,7 @@ class GridWorld:
                     line += '@'
                 else:
                     line += self.grid[y][x].to_str()
-            print(line)
+            print(f'\t{line}')
 
     def __get(self, direction: Position) -> Tile:
         new_pos = Position(direction.x + self.player.x, direction.y + self.player.y)
@@ -113,27 +112,62 @@ class GridWorld:
         else:
             return self.grid[new_pos.y][new_pos.x]
 
-    def observation(self) -> int:
-        return int(''.join(str(int(self.__get(d)))for d in DIR))
+    def observation(self) -> Tuple[str,...]:
+        tiles = []
+        for y in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE-1):
+            for x in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE-1):
+                if y == 0 and x == 0: 
+                    continue
+                
+                tiles.append(self.__get(Position(x, y)).to_str())
+
+        return tuple(tiles)
     
     def random_action(self) -> Action:
         return Action.from_int(randint(0, self.action_space-1))
     
     def step(self, a: int) -> Tuple[float, bool]:
-        # reward, and if the simulation is done or not
         a_mod =  Action.from_int(a).to_position()
         new_player_position = Position(self.player.x + a_mod.x, self.player.y + a_mod.y)
 
         if self.out_of_bounds(new_player_position):
-            return self.NEGATIVE_REWARD, False
+            return self.BASE_REWARD, False
         
         tile = self.grid[new_player_position.y][new_player_position.x]
+        if tile != Tile.Block:
+            self.player = new_player_position
+
         if tile == Tile.Hazard:          return self.HAZARD_REWARD, True
         if tile == Tile.Positive_Reward: return self.GOAL_REWARD, True
         if tile == Tile.Negative_Reward: return self.NEGATIVE_REWARD, True
-
-        if tile != Tile.Block:
-            self.player = new_player_position
     
         return self.BASE_REWARD, False
 
+    def get_solution(self) -> List[Action]:
+        self.reset()
+        ACTIONS: List[Action] = [Action.Up, Action.Down, Action.Right, Action.Left]
+        queue = [(self.player, [])]
+        visited = set()
+
+        while len(queue) > 0:
+            state, actions = queue.pop(0)
+            if state in visited:
+                continue
+            
+            visited.add(state)
+
+            for a in ACTIONS:
+                mod = a.to_position()
+                new_state = Position(state.x + mod.x, state.y + mod.y)
+
+                new_actions = actions.copy()
+                new_actions.append(a)
+
+                if not self.out_of_bounds(new_state):
+                    tile = self.grid[new_state.y][new_state.x]
+                    if tile == Tile.Positive_Reward:
+                        return new_actions
+                    elif tile == Tile.Empty:
+                        queue.append((new_state, new_actions))
+
+        return []
