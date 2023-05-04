@@ -90,11 +90,15 @@ class QLearning:
         done = False
 
         while not done:
-            action = self.__best_action(self.env.observation())
+            state = self.env.observation()
+            if state not in self.q_table:
+                print("Unseen state, using random action.")
+                action = self.env.random_action()
+            else:
+                action = self.__best_action(state)
             reward, done = self.env.step(action)
             
             print()
             self.env.render()
-            print(self.q_table[self.env.observation()])
             print(f'action={Action.from_int(action).to_str()}, reward={reward}')
             sleep(0.1)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, Tuple
 from enum import IntEnum
-from random import randint, shuffle
+from random import randint, choice, random, shuffle
 from collections import namedtuple
 
 Position = namedtuple("Position", ["x", "y"])
@@ -74,11 +74,26 @@ class GridWorld:
 
     def random_grid(self) -> None:
         self.grid = [[Tile.Empty for _ in range(self.width)] for __ in range(self.height)]
-        rand_x = randint(1, self.width-2)
-        rand_y = randint(1, self.height-2)
+        self.grid[0][self.width-1] = Tile.Positive_Reward
+        self.grid[1][self.width-1] = Tile.Negative_Reward
 
-        self.grid[rand_y][rand_x] = Tile.Block
-        self.player = Position(0,self.height-1)
+        self.player = Position(0, self.height - 1)
+        free_blocks = [Position(0,self.height-1)]
+
+        temp = self.get_solution(dfs=True)
+        for a in temp:
+            mod = a.to_position()
+            new_pos = Position(free_blocks[-1].x + mod.x, free_blocks[-1].y + mod.y)
+            free_blocks.append(new_pos)
+
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                pos = Position(x, y)
+                if pos in free_blocks:
+                    continue
+                
+                if random() > 0.5:
+                    self.grid[y][x] = Tile.Block           
 
         self.grid[0][self.width-1] = Tile.Positive_Reward
         self.grid[1][self.width-1] = Tile.Negative_Reward
@@ -143,18 +158,25 @@ class GridWorld:
     
         return self.BASE_REWARD, False
 
-    def get_solution(self) -> List[Action]:
+    def get_solution(self, dfs=False) -> List[Action]:
         self.reset()
         ACTIONS: List[Action] = [Action.Up, Action.Down, Action.Right, Action.Left]
         queue = [(self.player, [])]
         visited = set()
 
         while len(queue) > 0:
-            state, actions = queue.pop(0)
+            if dfs:
+                state, actions = queue.pop()
+            else:
+                state, actions = queue.pop(0)
+            
             if state in visited:
                 continue
             
             visited.add(state)
+
+            if dfs:
+                shuffle(ACTIONS)
 
             for a in ACTIONS:
                 mod = a.to_position()
