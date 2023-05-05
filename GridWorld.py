@@ -54,7 +54,7 @@ class Tile(IntEnum):
         raise SystemError(f'Unsupported tile type: {self}.')
 
 class GridWorld:
-    BASE_REWARD = -0.04
+    BASE_REWARD = -1
     HAZARD_REWARD = -30
     NEGATIVE_REWARD = -20
     GOAL_REWARD = 20
