@@ -42,24 +42,21 @@ class Tile(IntEnum):
     Block = 1
     Hazard = 2
     Positive_Reward = 3
-    Negative_Reward = 4
 
     def to_str(self) -> str:
         if self == Tile.Empty: return  '.'
         if self == Tile.Block: return  'X'
         if self == Tile.Hazard: return '^'
         if self == Tile.Positive_Reward: return '+'
-        if self == Tile.Negative_Reward: return '-'
 
         raise SystemError(f'Unsupported tile type: {self}.')
 
 class GridWorld:
     BASE_REWARD = -1
-    HAZARD_REWARD = -30
-    NEGATIVE_REWARD = -20
+    HAZARD_REWARD = -20
     GOAL_REWARD = 20
 
-    OBSERVATION_SIZE = 5
+    OBSERVATION_SIZE = 4
 
     def __init__(self, width: int, height: int):
         self.width = width
@@ -75,7 +72,6 @@ class GridWorld:
     def random_grid(self) -> None:
         self.grid = [[Tile.Empty for _ in range(self.width)] for __ in range(self.height)]
         self.grid[0][self.width-1] = Tile.Positive_Reward
-        self.grid[1][self.width-1] = Tile.Negative_Reward
 
         self.player = Position(0, self.height - 1)
         free_blocks = [Position(0,self.height-1)]
@@ -92,11 +88,13 @@ class GridWorld:
                 if pos in free_blocks:
                     continue
                 
-                if random() > 0.5:
-                    self.grid[y][x] = Tile.Block           
+                rand_number = random()
+                if rand_number > 0.8:
+                    self.grid[y][x] = Tile.Hazard
+                elif rand_number > 0.5:
+                    self.grid[y][x] = Tile.Block
 
         self.grid[0][self.width-1] = Tile.Positive_Reward
-        self.grid[1][self.width-1] = Tile.Negative_Reward
 
     def reset(self) -> None:
         self.player = Position(0,self.height-1)
@@ -154,7 +152,6 @@ class GridWorld:
 
         if tile == Tile.Hazard:          return self.HAZARD_REWARD, True
         if tile == Tile.Positive_Reward: return self.GOAL_REWARD, True
-        if tile == Tile.Negative_Reward: return self.NEGATIVE_REWARD, True
     
         return self.BASE_REWARD, False
 

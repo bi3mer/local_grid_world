@@ -101,4 +101,4 @@ class QLearning:
             print()
             self.env.render()
             print(f'action={Action.from_int(action).to_str()}, reward={reward}')
-            sleep(0.1)
+            sleep(0.2)
