@@ -56,7 +56,7 @@ class GridWorld:
     HAZARD_REWARD = -20
     GOAL_REWARD = 20
 
-    OBSERVATION_SIZE = 4
+    OBSERVATION_SIZE = 2
 
     def __init__(self, width: int, height: int):
         self.width = width
@@ -96,6 +96,10 @@ class GridWorld:
 
         self.grid[0][self.width-1] = Tile.Positive_Reward
 
+    def empty_grid(self) -> None:
+        self.grid = [[Tile.Empty for _ in range(self.width)] for __ in range(self.height)]
+        self.grid[0][self.width-1] = Tile.Positive_Reward
+
     def reset(self) -> None:
         self.player = Position(0,self.height-1)
 
@@ -127,8 +131,8 @@ class GridWorld:
 
     def observation(self) -> Tuple[str,...]:
         tiles = []
-        for y in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE-1):
-            for x in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE-1):
+        for y in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE+1):
+            for x in range(-self.OBSERVATION_SIZE, self.OBSERVATION_SIZE+1):
                 if y == 0 and x == 0: 
                     continue
                 
