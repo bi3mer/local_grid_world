@@ -85,11 +85,17 @@ class QLearning:
 
                 state = next_state
 
-    def visualize_policy_playthrough(self):
+    def visualize_policy_playthrough(self) -> bool:
         self.env.reset()
         done = False
+        won = False
+        steps = 0
 
         while not done:
+            if steps >= 50:
+                print('Max step count reached! The agent loses :/')
+                break
+
             state = self.env.observation()
             if state not in self.q_table:
                 print("Unseen state, using random action.")
@@ -102,3 +108,8 @@ class QLearning:
             self.env.render()
             print(f'action={Action.from_int(action).to_str()}, reward={reward}')
             sleep(0.2)
+
+            steps += 1
+            won = (done == True and reward > 1)
+
+        return won

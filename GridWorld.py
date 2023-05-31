@@ -50,6 +50,7 @@ class Tile(IntEnum):
         if self == Tile.Positive_Reward: return '+'
 
         raise SystemError(f'Unsupported tile type: {self}.')
+    
 
 class GridWorld:
     BASE_REWARD = -1
@@ -57,6 +58,36 @@ class GridWorld:
     GOAL_REWARD = 20
 
     OBSERVATION_SIZE = 2
+
+    @staticmethod
+    def from_file(path: str) -> GridWorld:
+        tiles: List[Tuple[int, int, Tile]] = []
+        max_x = 0
+        max_y = 0
+        with open(path, 'r') as f:
+            for (y, line) in enumerate(f.readlines()):
+                max_y = max(max_y, y) # lazy
+                for (x, tile) in enumerate(line.strip()):
+                    max_x = max(max_x, x) # lazy
+
+                    # this would be better as a static method in tile
+                    if tile == 'X':
+                        tiles.append((x, y, Tile.Block))
+                    elif tile == '^':
+                        tiles.append((x, y, Tile.Hazard))
+                    elif tile == '+':
+                        tiles.append((x, y, Tile.Positive_Reward))
+
+        # We want to make sure that the level is never made bigger. Not friendly
+        # if this was a real game
+        assert max_x == 9 # 0 indexed
+        assert max_y == 9 # 0 indexed
+
+        env = GridWorld(10,10)
+        for (x, y, tile) in tiles:
+            env.grid[y][x] = tile
+
+        return env
 
     def __init__(self, width: int, height: int):
         self.width = width
