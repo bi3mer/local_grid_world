@@ -1,4 +1,4 @@
-from os.path import join, exists
+from os.path import join
 from os import listdir, remove
 from shutil import copyfile
 
